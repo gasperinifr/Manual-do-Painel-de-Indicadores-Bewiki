@@ -1,0 +1,763 @@
+<title>Manual do Painel de Indicadores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+
+<style>
+  /* ==========================================================================
+     Paleta do próprio motor: o navy é o do cabeçalho dos e-mails, e as quatro
+     cores de severidade são exatamente as que o script pinta nas células da
+     planilha (CORES_SEVERIDADE em 05_Comments.gs). O manual se parece com o
+     que a pessoa vê no dia a dia.
+     ========================================================================== */
+  :root {
+    --marca:        #1f3864;
+    --marca-clara:  #2d4f8a;
+    --tinta:        #16202e;
+    --tinta-suave:  #4f6076;
+    --tinta-fraca:  #7c8b9c;
+    --fundo:        #fbfbfc;
+    --superficie:   #ffffff;
+    --superficie-2: #f2f4f7;
+    --linha:        #dfe4ea;
+    --linha-forte:  #c3ccd7;
+
+    --critica:      #b3261e;
+    --critica-bg:   #f8d7da;
+    --alta:         #c25608;
+    --alta-bg:      #fde2cf;
+    --media:        #8f6208;
+    --media-bg:     #fff3cd;
+    --baixa:        #1e7d5a;
+    --baixa-bg:     #e2f0d9;
+
+    --capa-bg:      #1f3864;
+    --capa-tinta:   #ffffff;
+    --capa-suave:   #c9d4e8;
+
+    --sombra:       0 1px 2px rgba(22,32,46,.05), 0 6px 20px -12px rgba(22,32,46,.18);
+    --leitura:      68ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --marca:        #9fb8e0;
+      --marca-clara:  #c3d4ee;
+      --tinta:        #e8edf3;
+      --tinta-suave:  #a9b7c6;
+      --tinta-fraca:  #7e8c9c;
+      --fundo:        #11161e;
+      --superficie:   #171e28;
+      --superficie-2: #1e2733;
+      --linha:        #2b3542;
+      --linha-forte:  #3d4a5a;
+
+      --critica:      #f4a09b;
+      --critica-bg:   #3d1d20;
+      --alta:         #f0b483;
+      --alta-bg:      #3a2617;
+      --media:        #e8c96a;
+      --media-bg:     #362d13;
+      --baixa:        #8fd0ac;
+      --baixa-bg:     #17301f;
+
+      --capa-bg:      #1a2434;
+      --capa-tinta:   #eaf0f7;
+      --capa-suave:   #93a6c2;
+
+      --sombra:       0 1px 2px rgba(0,0,0,.4), 0 6px 20px -12px rgba(0,0,0,.6);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --marca:        #9fb8e0;
+    --marca-clara:  #c3d4ee;
+    --tinta:        #e8edf3;
+    --tinta-suave:  #a9b7c6;
+    --tinta-fraca:  #7e8c9c;
+    --fundo:        #11161e;
+    --superficie:   #171e28;
+    --superficie-2: #1e2733;
+    --linha:        #2b3542;
+    --linha-forte:  #3d4a5a;
+
+    --critica:      #f4a09b;
+    --critica-bg:   #3d1d20;
+    --alta:         #f0b483;
+    --alta-bg:      #3a2617;
+    --media:        #e8c96a;
+    --media-bg:     #362d13;
+    --baixa:        #8fd0ac;
+    --baixa-bg:     #17301f;
+
+    --capa-bg:      #1a2434;
+    --capa-tinta:   #eaf0f7;
+    --capa-suave:   #93a6c2;
+
+    --sombra:       0 1px 2px rgba(0,0,0,.4), 0 6px 20px -12px rgba(0,0,0,.6);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--fundo);
+    color: var(--tinta);
+    font-family: "Source Sans 3", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--marca); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:hover { color: var(--marca-clara); }
+  :focus-visible { outline: 2px solid var(--marca); outline-offset: 2px; border-radius: 2px; }
+
+  code, .mono {
+    font-family: "IBM Plex Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+    font-size: .88em;
+  }
+  code {
+    background: var(--superficie-2);
+    border: 1px solid var(--linha);
+    border-radius: 4px;
+    padding: .1em .34em;
+    white-space: nowrap;
+  }
+
+  /* ---------- cabeçalho ---------- */
+  .capa {
+    background: var(--capa-bg);
+    color: var(--capa-tinta);
+    padding: 3.2rem 1.5rem 2.6rem;
+  }
+  .capa-int { max-width: 1180px; margin: 0 auto; }
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .72rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--capa-suave);
+    margin: 0 0 .9rem;
+  }
+  .capa h1 {
+    font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 5vw, 3.1rem);
+    line-height: 1.08;
+    letter-spacing: -.015em;
+    margin: 0;
+    text-wrap: balance;
+    max-width: 24ch;
+  }
+  .capa p {
+    margin: 1.1rem 0 0;
+    font-size: 1.08rem;
+    max-width: 56ch;
+    color: var(--capa-suave);
+  }
+
+  /* ---------- estrutura ---------- */
+  .corpo {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 1.5rem 5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  @media (min-width: 1060px) {
+    .corpo { grid-template-columns: 15rem minmax(0, 1fr); gap: 3.5rem; align-items: start; }
+  }
+
+  /* ---------- índice ---------- */
+  .indice { padding-top: 2.5rem; }
+  @media (min-width: 1060px) {
+    .indice { position: sticky; top: 1.5rem; max-height: calc(100vh - 3rem); overflow-y: auto; }
+  }
+  .indice-titulo {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .7rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--tinta-fraca);
+    margin: 0 0 .8rem;
+  }
+  .indice ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .1rem; }
+  .indice a {
+    display: grid;
+    grid-template-columns: 1.9rem 1fr;
+    gap: .1rem;
+    padding: .34rem .4rem;
+    border-radius: 5px;
+    text-decoration: none;
+    color: var(--tinta-suave);
+    font-size: .93rem;
+    line-height: 1.35;
+  }
+  .indice a:hover { background: var(--superficie-2); color: var(--tinta); }
+  .indice .num {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .78rem;
+    color: var(--tinta-fraca);
+    padding-top: .1em;
+  }
+  details.indice-mobile { margin-top: 2rem; }
+  details.indice-mobile summary {
+    cursor: pointer; font-weight: 600; color: var(--marca);
+    padding: .6rem 0; font-size: .95rem;
+  }
+  @media (min-width: 1060px) { details.indice-mobile { display: none; } }
+  @media (max-width: 1059px) { .indice > ol { display: none; } .indice-titulo { display: none; } }
+
+  main { padding-top: 2.5rem; min-width: 0; }
+
+  section { margin: 0 0 3.4rem; scroll-margin-top: 1.5rem; }
+  section > * { max-width: var(--leitura); }
+  section > .largo { max-width: none; }
+
+  h2 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: clamp(1.5rem, 3vw, 1.95rem);
+    font-weight: 700;
+    line-height: 1.18;
+    letter-spacing: -.01em;
+    margin: 0 0 1rem;
+    text-wrap: balance;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: .7rem;
+    align-items: baseline;
+  }
+  h2 .h2num {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .72em;
+    font-weight: 400;
+    color: var(--tinta-fraca);
+    font-variant-numeric: tabular-nums;
+  }
+  h3 {
+    font-family: "Source Sans 3", sans-serif;
+    font-size: 1.12rem;
+    font-weight: 700;
+    margin: 2rem 0 .6rem;
+    color: var(--tinta);
+  }
+  p { margin: 0 0 1rem; }
+  ul, ol.lista { margin: 0 0 1.1rem; padding-left: 1.3rem; }
+  li { margin-bottom: .42rem; }
+  strong { font-weight: 700; }
+
+  /* ---------- passos: Z1 → Z2 → Z3 ---------- */
+  .passos {
+    display: grid; gap: 1rem; margin: 0 0 1.6rem;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 620px) { .passos { grid-template-columns: repeat(3, 1fr); } }
+  .passo {
+    background: var(--superficie);
+    border: 1px solid var(--linha);
+    border-top: 3px solid var(--marca);
+    border-radius: 8px;
+    padding: 1rem 1.1rem 1.1rem;
+    box-shadow: var(--sombra);
+  }
+  .passo .arq {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .85rem; font-weight: 600; color: var(--marca);
+    display: block; margin-bottom: .3rem;
+  }
+  .passo .oq { font-weight: 700; font-size: .98rem; display: block; margin-bottom: .35rem; }
+  .passo .det { font-size: .88rem; color: var(--tinta-suave); line-height: 1.5; }
+
+  /* ---------- destaques ---------- */
+  .nota {
+    border-left: 3px solid var(--marca);
+    background: var(--superficie-2);
+    padding: .95rem 1.1rem;
+    border-radius: 0 7px 7px 0;
+    margin: 1.3rem 0;
+  }
+  .nota > :last-child { margin-bottom: 0; }
+  .nota .rot {
+    display: block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--marca); margin-bottom: .4rem;
+  }
+  .nota.cuidado { border-left-color: var(--alta); background: var(--alta-bg); }
+  .nota.cuidado .rot { color: var(--alta); }
+  .nota.ok { border-left-color: var(--baixa); background: var(--baixa-bg); }
+  .nota.ok .rot { color: var(--baixa); }
+  .nota.critico { border-left-color: var(--critica); background: var(--critica-bg); }
+  .nota.critico .rot { color: var(--critica); }
+
+  /* ---------- tabelas ---------- */
+  .tab-wrap { overflow-x: auto; margin: 0 0 1.4rem; border: 1px solid var(--linha); border-radius: 8px; background: var(--superficie); }
+  table { border-collapse: collapse; width: 100%; font-size: .93rem; }
+  th, td { text-align: left; padding: .62rem .85rem; vertical-align: top; border-top: 1px solid var(--linha); }
+  thead th {
+    border-top: 0;
+    background: var(--superficie-2);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .68rem; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--tinta-suave); font-weight: 600; white-space: nowrap;
+  }
+  tbody tr:hover { background: var(--superficie-2); }
+  td code { white-space: normal; }
+
+  /* faixas de severidade / semáforo */
+  .faixa { display: inline-block; padding: .1rem .5rem; border-radius: 20px; font-size: .78rem; font-weight: 700; white-space: nowrap; }
+  .faixa.v { background: var(--critica-bg); color: var(--critica); }
+  .faixa.a { background: var(--alta-bg);    color: var(--alta); }
+  .faixa.m { background: var(--media-bg);   color: var(--media); }
+  .faixa.b { background: var(--baixa-bg);   color: var(--baixa); }
+
+  .amostra { display: inline-block; width: 1.05rem; height: 1.05rem; border-radius: 3px; border: 1px solid var(--linha-forte); vertical-align: -.18em; margin-right: .35rem; }
+
+  /* ---------- blocos de código ---------- */
+  pre {
+    margin: 0 0 1.3rem;
+    background: var(--superficie-2);
+    border: 1px solid var(--linha);
+    border-radius: 8px;
+    padding: .9rem 1rem;
+    overflow-x: auto;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .84rem;
+    line-height: 1.6;
+    color: var(--tinta);
+  }
+  pre code { background: none; border: 0; padding: 0; white-space: pre; }
+
+  /* ---------- rodapé ---------- */
+  footer {
+    border-top: 1px solid var(--linha);
+    margin-top: 1rem;
+    padding-top: 1.4rem;
+    font-size: .87rem;
+    color: var(--tinta-suave);
+    max-width: var(--leitura);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
+  html { scroll-behavior: smooth; }
+</style>
+
+<header class="capa">
+  <div class="capa-int">
+    <p class="eyebrow">Bewiki Care · Setor de Qualidade</p>
+    <h1>Manual do Painel de Indicadores</h1>
+    <p>O sistema lê as planilhas da Qualidade sozinho, comenta as linhas com problema e manda um e-mail toda segunda-feira às 7h. Este manual explica como operar e o que fazer quando algo não sai como esperado. Não precisa saber programar.</p>
+  </div>
+</header>
+
+<div class="corpo">
+
+  <nav class="indice" aria-label="Índice">
+    <p class="indice-titulo">Índice</p>
+    <ol>
+      <li><a href="#s1"><span class="num">01</span><span>O que o sistema faz</span></a></li>
+      <li><a href="#s2"><span class="num">02</span><span>Os dois e-mails que você recebe</span></a></li>
+      <li><a href="#s3"><span class="num">03</span><span>O que aparece nas planilhas</span></a></li>
+      <li><a href="#s4"><span class="num">04</span><span>As três tarefas do dia a dia</span></a></li>
+      <li><a href="#s5"><span class="num">05</span><span>Rodar agora, sem esperar</span></a></li>
+      <li><a href="#s6"><span class="num">06</span><span>Quando algo dá errado</span></a></li>
+      <li><a href="#s7"><span class="num">07</span><span>As chaves de API</span></a></li>
+      <li><a href="#s8"><span class="num">08</span><span>Melhorar os comentários</span></a></li>
+      <li><a href="#s9"><span class="num">09</span><span>O que o sistema não faz</span></a></li>
+      <li><a href="#s10"><span class="num">10</span><span>Glossário</span></a></li>
+      <li><a href="#s11"><span class="num">11</span><span>Onde fica cada coisa</span></a></li>
+      <li><a href="#s12"><span class="num">12</span><span>Rotina de manutenção</span></a></li>
+      <li><a href="#s13"><span class="num">13</span><span>Chamar ajuda técnica</span></a></li>
+    </ol>
+    <details class="indice-mobile">
+      <summary>Ver índice</summary>
+      <ol>
+        <li><a href="#s1"><span class="num">01</span><span>O que o sistema faz</span></a></li>
+        <li><a href="#s2"><span class="num">02</span><span>Os dois e-mails que você recebe</span></a></li>
+        <li><a href="#s3"><span class="num">03</span><span>O que aparece nas planilhas</span></a></li>
+        <li><a href="#s4"><span class="num">04</span><span>As três tarefas do dia a dia</span></a></li>
+        <li><a href="#s5"><span class="num">05</span><span>Rodar agora, sem esperar</span></a></li>
+        <li><a href="#s6"><span class="num">06</span><span>Quando algo dá errado</span></a></li>
+        <li><a href="#s7"><span class="num">07</span><span>As chaves de API</span></a></li>
+        <li><a href="#s8"><span class="num">08</span><span>Melhorar os comentários</span></a></li>
+        <li><a href="#s9"><span class="num">09</span><span>O que o sistema não faz</span></a></li>
+        <li><a href="#s10"><span class="num">10</span><span>Glossário</span></a></li>
+        <li><a href="#s11"><span class="num">11</span><span>Onde fica cada coisa</span></a></li>
+        <li><a href="#s12"><span class="num">12</span><span>Rotina de manutenção</span></a></li>
+        <li><a href="#s13"><span class="num">13</span><span>Chamar ajuda técnica</span></a></li>
+      </ol>
+    </details>
+  </nav>
+
+  <main>
+
+    <section id="s1">
+      <h2><span class="h2num">01</span><span>O que o sistema faz</span></h2>
+      <p>Toda segunda-feira às 7h, sozinho, sem ninguém apertar nada:</p>
+      <ol class="lista">
+        <li>Abre a pasta <strong>Qualidade&nbsp;-&nbsp;Fontes do Motor</strong> no Google Drive</li>
+        <li>Lê todas as planilhas que estiverem lá dentro</li>
+        <li>Conta, soma e compara com a semana anterior</li>
+        <li>Pede a uma inteligência artificial para interpretar os números</li>
+        <li>Escreve um comentário nas linhas que parecem ter problema, <strong>dentro da própria planilha</strong></li>
+        <li>Manda um e-mail com o resumo</li>
+      </ol>
+      <p>Você não precisa preparar nada, nem padronizar planilha. O sistema descobre sozinho o que é cada coluna, mesmo que cada setor preencha de um jeito diferente.</p>
+
+      <div class="nota critico">
+        <span class="rot">A regra de ouro</span>
+        <p>Os <strong>números</strong> do e-mail são calculados por computador e estão certos. As <strong>interpretações</strong> e <strong>recomendações</strong> são sugestões de uma inteligência artificial e podem estar erradas.</p>
+        <p>Sempre confira antes de decidir algo com base nelas. É por isso que todo e-mail traz esse aviso no pé.</p>
+      </div>
+    </section>
+
+    <section id="s2">
+      <h2><span class="h2num">02</span><span>Os dois e-mails que você recebe</span></h2>
+      <div class="nota ok">
+        <span class="rot">Todo dia, ~13h — a sentinela</span>
+        <p>Um e-mail curto dizendo se o sistema está de pé. Assunto começa com <strong>[OK]</strong>, <strong>[AVISO]</strong> ou <strong>[FALHA]</strong>. Confere chaves, pasta de fontes, agendamentos, últimas execuções e consumo do dia.</p>
+        <p><strong>Não gasta cota de inteligência artificial.</strong> Um monitor que consome o recurso que monitora falharia justo no dia em que precisa avisar. Se em algum dia esse e-mail não chegar, isso também é informação: algo travou.</p>
+      </div>
+      <h3>Toda segunda, ~7h — o relatório de indicadores</h3>
+      <p>O assunto começa com uma destas três faixas — dá para triar sem abrir:</p>
+      <div class="tab-wrap">
+        <table>
+          <thead><tr><th>Assunto começa com</th><th>Significa</th></tr></thead>
+          <tbody>
+            <tr><td><span class="faixa b">DENTRO DO ESPERADO</span></td><td>Nada de anormal na semana</td></tr>
+            <tr><td><span class="faixa m">PONTOS DE ATENÇÃO</span></td><td>Tem coisa para olhar, sem urgência</td></tr>
+            <tr><td><span class="faixa v">ATENÇÃO CRÍTICA</span></td><td>Tem achado grave. Abra hoje.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Dentro do e-mail, nesta ordem</h3>
+      <ul>
+        <li><strong>Resumo executivo</strong> — 3 a 5 frases. Se você só tiver 30 segundos, leia isto.</li>
+        <li><strong>Por planilha</strong> — quantos registros cada planilha teve e a variação em relação à semana passada: ▲ subiu, ▼ caiu, ■ estável. Cada nome é um link; clique e a planilha abre.</li>
+        <li><strong>Indicadores</strong> — os números da semana, em cartões.</li>
+        <li><strong>Achados</strong> — os problemas encontrados, com uma barra colorida indicando a gravidade.</li>
+        <li><strong>Ações recomendadas</strong> — o que fazer, em quanto tempo e por qual área. Nunca aparece nome de pessoa: notificação de qualidade não serve para apontar culpado.</li>
+        <li><strong>Linhas que exigem revisão manual</strong> — até 15 linhas específicas, com o número da linha, para você ir direto nelas.</li>
+        <li><strong>Qualidade do preenchimento</strong> — nota de 0 a 10 sobre o quão bem preenchidas estão as planilhas.</li>
+      </ul>
+
+      <div class="nota">
+        <span class="rot">Leia com atenção</span>
+        <p>Se uma planilha teve <strong>menos</strong> registros que na semana anterior, o sistema trata isso como possível <strong>subnotificação</strong>, não como melhora. Menos notificação normalmente quer dizer que as pessoas pararam de notificar — não que pararam de acontecer eventos.</p>
+      </div>
+    </section>
+
+    <section id="s3">
+      <h2><span class="h2num">03</span><span>O que aparece nas planilhas</span></h2>
+      <p>Na primeira vez que o sistema analisa uma planilha, ele cria <strong>duas colunas novas no fim</strong> dela:</p>
+      <div class="tab-wrap">
+        <table>
+          <thead><tr><th>Coluna</th><th>O que tem dentro</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Comentário IA</strong></td><td>O comentário sobre aquela linha. Vazio significa que a linha está ok.</td></tr>
+            <tr><td><strong>Análise IA (data)</strong></td><td>Quando foi analisada e a gravidade. Por exemplo: <code>2026-08-31 · alta</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>A célula do comentário fica colorida conforme a gravidade — as mesmas cores das faixas do e-mail:</p>
+      <div class="tab-wrap">
+        <table>
+          <thead><tr><th>Cor na célula</th><th>Gravidade</th></tr></thead>
+          <tbody>
+            <tr><td><span class="amostra" style="background:#f8d7da"></span> Vermelho claro</td><td>Crítica</td></tr>
+            <tr><td><span class="amostra" style="background:#fde2cf"></span> Laranja claro</td><td>Alta</td></tr>
+            <tr><td><span class="amostra" style="background:#fff3cd"></span> Amarelo claro</td><td>Média</td></tr>
+            <tr><td><span class="amostra" style="background:#e2f0d9"></span> Verde claro</td><td>Baixa</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="nota ok">
+        <span class="rot">Pode ficar tranquilo</span>
+        <p>O sistema <strong>não apaga, não corrige e não move</strong> nada que você escreveu. Ele só escreve nessas duas colunas — e só limpa a cor que ele mesmo pintou antes, nunca a formatação que o setor aplicou.</p>
+        <p>Pode apagar o conteúdo dessas colunas à vontade: na próxima execução ele reescreve. E rodar duas vezes no mesmo dia não duplica coluna nem recomenta a mesma linha.</p>
+      </div>
+    </section>
+
+    <section id="s4">
+      <h2><span class="h2num">04</span><span>As três tarefas do dia a dia</span></h2>
+
+      <h3>4.1 · Incluir uma planilha nova na análise</h3>
+      <p>Esta é a operação mais comum, e <strong>não precisa mexer em código</strong>. Abra a pasta de fontes e coloque a planilha lá:</p>
+      <p><a href="https://drive.google.com/drive/folders/1XQP4luO40ecRZXKYI93qkfIN-Oacaxyx">Pasta “Qualidade&nbsp;-&nbsp;Fontes do Motor” ↗</a></p>
+      <div class="tab-wrap">
+        <table>
+          <thead><tr><th>Se a planilha…</th><th>Faça assim</th></tr></thead>
+          <tbody>
+            <tr><td><strong>é sua</strong></td><td>Arraste o arquivo para dentro da pasta</td></tr>
+            <tr><td><strong>é de outra pessoa</strong><br><span style="color:var(--tinta-suave)">(aparece em “Compartilhados comigo”)</span></td><td>Clique nos <strong>⋮</strong> ao lado dela → <strong>Organizar</strong> → <strong>Adicionar atalho</strong> → escolha a pasta</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Pronto: ela entra na próxima segunda-feira.</p>
+      <div class="nota">
+        <span class="rot">Por que atalho</span>
+        <p>Você não pode <em>mover</em> para a sua pasta um arquivo que não é seu. O atalho resolve, e o sistema entende atalho exatamente como entende arquivo.</p>
+      </div>
+      <p>Você <strong>não</strong> precisa avisar ninguém, dizer quais são as colunas, nem padronizar nada.</p>
+
+      <h3>4.2 · Tirar uma planilha da análise</h3>
+      <ul>
+        <li><strong>Simples:</strong> tire a planilha (ou o atalho) da pasta.</li>
+        <li><strong>Sem tirar da pasta:</strong> renomeie o arquivo pondo <code>EXCLUIR</code> no começo do nome.</li>
+      </ul>
+      <p>O sistema pula qualquer arquivo cujo nome contenha <code>EXCLUIR</code>, <code>Modelo</code>, <code>Teste</code>, <code>Rascunho</code>, <code>Arquivo morto</code>, <code>Cópia de</code>, <code>Financeiro</code> ou <code>Planilha sem título</code>.</p>
+
+      <h3>4.3 · Mudar quem recebe o e-mail</h3>
+      <p>Esta precisa de uma mexida no código — uma linha só.</p>
+      <ol class="lista">
+        <li>Abra <a href="https://script.google.com/home/projects/1sLpylZrGaBvhv2xK2g2LI7-zs8hoD3HOp0hS8YKxdiw6Hlxg7qAmCjNV/edit">o programa no Apps Script ↗</a></li>
+        <li>Na lista da esquerda, clique em <code>00_Config.gs</code></li>
+        <li>Aperte <strong>Ctrl+F</strong> e procure por <code>destinatarios</code></li>
+        <li>Edite os e-mails, cada um entre apóstrofos e separados por vírgula</li>
+        <li><strong>Ctrl+S</strong> para salvar</li>
+      </ol>
+<pre><code>destinatarios: { to: ['ana@empresa.com.br', 'bruno@empresa.com.br'],
+                 cc: ['diretoria@empresa.com.br'] },</code></pre>
+      <div class="nota ok">
+        <span class="rot">A Qualidade recebe sempre</span>
+        <p>Você <strong>não</strong> precisa incluir a Qualidade nessa lista. Todo e-mail de indicador já sai com cópia para ela automaticamente, por regra do próprio sistema.</p>
+        <p>Isso é de propósito: se dependesse de alguém lembrar de repetir os endereços da Qualidade em cada configuração nova, um dia alguém esqueceria — e a falha seria silenciosa, porque o e-mail sai normalmente, só não chega para quem consolida os indicadores.</p>
+      </div>
+      <div class="nota cuidado">
+        <span class="rot">Cuidado</span>
+        <p>Os apóstrofos <code>'</code>, as vírgulas e os colchetes <code>[ ]</code> precisam ficar exatamente assim. Se apagar um por acidente, o sistema para de funcionar. Se acontecer, use <strong>Ctrl+Z</strong> para desfazer.</p>
+      </div>
+    </section>
+
+    <section id="s5">
+      <h2><span class="h2num">05</span><span>Rodar agora, sem esperar</span></h2>
+      <p>Abra o programa no Apps Script, clique no arquivo na lista da esquerda e clique em <strong>▶ Executar</strong>. Cada arquivo tem uma função só, então não precisa mexer em nenhum seletor.</p>
+      <p>Use sempre nesta ordem:</p>
+      <div class="passos largo">
+        <div class="passo">
+          <span class="arq">Z1_Diagnosticar</span>
+          <span class="oq">Confere as fontes</span>
+          <span class="det">Diz quantas linhas cada planilha tem e o que o sistema entendeu de cada coluna. Não usa inteligência artificial, não gasta cota, não escreve nada, não manda e-mail. Pode rodar à vontade.</span>
+        </div>
+        <div class="passo">
+          <span class="arq">Z2_Testar</span>
+          <span class="oq">Ensaio geral</span>
+          <span class="det">Faz a análise completa de verdade, mas manda o e-mail <strong>só para você</strong>, com <code>[TESTE]</code> no assunto, e não escreve nas planilhas. Consome cota.</span>
+        </div>
+        <div class="passo">
+          <span class="arq">Z3_Rodar</span>
+          <span class="oq">Valendo</span>
+          <span class="det">Manda para todos os destinatários e escreve os comentários nas planilhas. É o mesmo que o agendamento de segunda faz sozinho.</span>
+        </div>
+      </div>
+
+      <h3>Os outros três arquivos</h3>
+      <div class="passos largo">
+        <div class="passo">
+          <span class="arq">Z4_Sentinela</span>
+          <span class="oq">Está de pé?</span>
+          <span class="det">Roda a verificação de saúde agora, sem esperar as 13h. Custo zero. Use depois de consertar algo, para confirmar.</span>
+        </div>
+        <div class="passo">
+          <span class="arq">Z5_Agendar</span>
+          <span class="oq">Ligar os automáticos</span>
+          <span class="det">Cria os agendamentos. Rode uma vez, e de novo sempre que mudar dia ou hora. É seguro repetir: apaga os antigos antes de criar.</span>
+        </div>
+        <div class="passo">
+          <span class="arq">Z6_Modelos</span>
+          <span class="oq">Quais IAs existem</span>
+          <span class="det">Lista as inteligências artificiais que suas chaves podem usar hoje. Rode isto <strong>antes</strong> de pedir ajuda quando o log disser “Todos os modelos falharam”.</span>
+        </div>
+      </div>
+      <p>O resultado aparece embaixo, no painel <strong>Registro de execução</strong>.</p>
+    </section>
+
+    <section id="s6">
+      <h2><span class="h2num">06</span><span>Quando algo dá errado</span></h2>
+      <p>Primeiro lugar para olhar: a aba <strong>LOG</strong> da planilha de controle. Cada linha tem data, nível e mensagem. Procure por <code>ERROR</code> e <code>WARN</code>.</p>
+      <p><a href="https://docs.google.com/spreadsheets/d/1eI1WkQ2QkWVL0MENCNpmP2jhQtDSWYAzcKB-WF6VHOA/edit">Abrir a planilha de controle ↗</a></p>
+
+      <h3>Mensagens que são normais e não pedem ação</h3>
+      <div class="tab-wrap largo">
+        <table>
+          <thead><tr><th>Mensagem no log</th><th>Por que está tudo bem</th></tr></thead>
+          <tbody>
+            <tr><td><code>acima do teto de N TPM</code></td><td>O sistema percebeu que uma inteligência artificial não daria conta e trocou por outra na hora. Funcionou.</td></tr>
+            <tr><td><code>tempo de execução esgotado no lote</code></td><td>A planilha era grande. O que sobrou entra na próxima execução. Nada se perde.</td></tr>
+            <tr><td><code>linha(s) além do teto de 120</code></td><td>Mesma coisa: comenta 120 linhas por planilha por vez, o resto fica para depois.</td></tr>
+            <tr><td><code>Ignorando a planilha de controle</code></td><td>Correto. A planilha de log não deve ser analisada como se fosse dado.</td></tr>
+            <tr><td><code>Atalho "X" não pôde ser resolvido</code></td><td>O atalho aponta para um arquivo apagado ou que perdeu o compartilhamento. Apague o atalho.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Problemas de verdade</h3>
+      <div class="tab-wrap largo">
+        <table>
+          <thead><tr><th>Sintoma</th><th>Causa provável</th><th>O que fazer</th></tr></thead>
+          <tbody>
+            <tr><td>Não chegou e-mail nenhum</td><td>A execução falhou</td><td>Olhe a aba LOG. Você também deve ter recebido um e-mail com <code>[FALHA]</code> no assunto.</td></tr>
+            <tr><td><code>Aba não encontrada</code></td><td>A aba da planilha foi renomeada</td><td>Rode <code>Z1_Diagnosticar</code> para ver o nome que ele procurou</td></tr>
+            <tr><td><code>Nenhum cabeçalho preenchido</code></td><td>O cabeçalho não está nas 8 primeiras linhas, ou a aba está vazia</td><td>Confira se a planilha tem cabeçalho de verdade</td></tr>
+            <tr><td><code>papéis: NENHUM</code> no diagnóstico</td><td>Os nomes das colunas são muito fora do padrão</td><td>A planilha vai ser analisada mal. Vale renomear as colunas para algo mais claro: “Data”, “Descrição”, “Status”</td></tr>
+            <tr><td><code>Nenhuma chave configurada</code></td><td>As chaves de API saíram das configurações</td><td>Veja o item 07</td></tr>
+            <tr><td><code>Groq 401</code> · <code>Gemini 401/403</code></td><td>Uma chave expirou ou foi revogada</td><td>Gere outra e substitua (item 07)</td></tr>
+            <tr><td><code>Todos os modelos falharam</code></td><td>As inteligências artificiais mudaram de nome, ou a cota do dia acabou</td><td>Se for cota, espere até amanhã. Se persistir, peça ajuda técnica.</td></tr>
+            <tr><td>Comentários genéricos e inúteis</td><td>Falta contexto do seu setor</td><td>Item 08</td></tr>
+            <tr><td>O sistema entendeu as colunas errado</td><td>Cabeçalho ambíguo</td><td>Rode <code>limparCachePerfis</code> e depois <code>Z1_Diagnosticar</code> de novo</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="s7">
+      <h2><span class="h2num">07</span><span>As chaves de API</span></h2>
+      <p>O sistema usa inteligências artificiais gratuitas: chaves da <strong>Groq</strong> e do <strong>Google Gemini</strong>. Elas ficam guardadas nas configurações do projeto, <strong>nunca no código</strong>.</p>
+
+      <h3>Onde ver ou trocar</h3>
+      <ol class="lista">
+        <li>Abra o programa → <strong>⚙️ Configurações do projeto</strong> (engrenagem na barra da esquerda)</li>
+        <li>Role até <strong>Propriedades do script</strong></li>
+        <li>Você verá duas linhas: <code>GROQ_KEYS</code> e <code>GEMINI_KEYS</code></li>
+        <li>Para trocar: <strong>Editar propriedades do script</strong> → mude o valor → <strong>Salvar</strong></li>
+      </ol>
+      <p>Formato: as chaves na mesma linha, separadas por vírgula, sem espaço.</p>
+<pre><code>chave1,chave2,chave3</code></pre>
+      <p>Quantas você quiser. Mais chaves significa mais capacidade — o sistema distribui a carga entre elas sozinho, escolhendo a cada momento a que tem mais folga.</p>
+      <div class="tab-wrap">
+        <table>
+          <thead><tr><th>Onde gerar chave nova</th><th>Link</th></tr></thead>
+          <tbody>
+            <tr><td>Groq</td><td><a href="https://console.groq.com/keys">console.groq.com/keys ↗</a></td></tr>
+            <tr><td>Google Gemini</td><td><a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey ↗</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Para ver quanto foi consumido hoje, rode a função <code>relatorioChaves</code>. Não gasta nada.</p>
+    </section>
+
+    <section id="s8">
+      <h2><span class="h2num">08</span><span>Melhorar os comentários</span></h2>
+      <p>Se os comentários vierem genéricos — “verificar dados”, “revisar registro” — o problema quase sempre é falta de contexto: o sistema não conhece o seu setor.</p>
+      <ol class="lista">
+        <li>Abra <code>00_Config.gs</code></li>
+        <li>Procure por <code>atencao:</code> com <strong>Ctrl+F</strong></li>
+        <li>Acrescente frases suas, no mesmo formato: texto entre apóstrofos, vírgula no fim</li>
+      </ol>
+<pre><code>atencao: [
+  'Descrição com menos de 15 palavras é insuficiente e deve ser apontada.',
+  'Caso de alta severidade sem tratativa registrada é ALERTA CRÍTICO, sempre.',
+  'Evento em UTI sem horário preenchido é problema, porque o turno importa.',
+],</code></pre>
+      <div class="nota">
+        <span class="rot">O que escrever</span>
+        <p>Escreva o que você diria a um analista no primeiro dia de trabalho. Por exemplo: “se a classificação diz <em>queda</em> mas a descrição fala de medicação, está errado”, ou “notificação da Emergência quase nunca vem com o campo X preenchido; sinalize”.</p>
+        <p>Este é o campo que mais muda o resultado. Vale investir tempo nele.</p>
+      </div>
+    </section>
+
+    <section id="s9">
+      <h2><span class="h2num">09</span><span>O que o sistema não faz</span></h2>
+      <p>Honestidade sobre os limites, para não haver surpresa:</p>
+      <ul>
+        <li><strong>Não conserta planilha.</strong> Ele aponta o problema; corrigir é humano.</li>
+        <li><strong>Não lê arquivo Excel</strong> (<code>.xlsx</code>) solto no Drive. Só planilha do Google. Se tiver um <code>.xlsx</code>, abra e use <em>Arquivo → Salvar como Planilhas Google</em>.</li>
+        <li><strong>Não lê Formulário.</strong> Lê a planilha de respostas do formulário, que é o que interessa.</li>
+        <li><strong>Não lê mais de 30 planilhas por execução.</strong> Se a pasta passar disso, o log avisa e o excedente fica de fora.</li>
+        <li><strong>Analisa no máximo 5.000 linhas por aba</strong> (as mais recentes) e comenta no máximo 120 linhas por planilha por execução.</li>
+        <li><strong>Só olha os últimos 7 dias.</strong> Registro antigo não entra no recorte do período.</li>
+        <li><strong>Não garante acerto.</strong> É inteligência artificial: erra. O e-mail avisa isso no pé.</li>
+        <li><strong>Não substitui análise humana.</strong> Ele economiza o trabalho de olhar linha por linha; a decisão continua sendo sua.</li>
+      </ul>
+
+      <div class="nota critico">
+        <span class="rot">Dados de paciente</span>
+        <p>O texto das planilhas é enviado para as empresas de inteligência artificial (Groq e Google) para ser analisado. O sistema <strong>tenta</strong> ignorar colunas de identificação pessoal — nome, e-mail, telefone, CPF, prontuário — mas <strong>isso não é garantia</strong>: se houver nome de paciente escrito no meio do texto de uma descrição, ele vai junto.</p>
+        <p>Se as planilhas tiverem identificação de paciente, <strong>avise a pessoa técnica antes de continuar usando</strong>. É necessário acrescentar uma etapa de mascaramento.</p>
+      </div>
+    </section>
+
+    <section id="s10">
+      <h2><span class="h2num">10</span><span>Glossário</span></h2>
+      <div class="tab-wrap largo">
+        <table>
+          <thead><tr><th>Termo</th><th>O que é, em português claro</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Apps Script</strong></td><td>Onde o programa mora. É um editor de código do Google, de graça, dentro da sua conta.</td></tr>
+            <tr><td><strong>Rotina</strong></td><td>Um e-mail agendado. Hoje existe uma: a varredura da Qualidade, toda segunda às 7h.</td></tr>
+            <tr><td><strong>Fonte</strong></td><td>Uma planilha mais uma aba. É a menor unidade que o sistema lê.</td></tr>
+            <tr><td><strong>Varredura</strong></td><td>O ato de olhar a pasta e pegar tudo que está lá dentro.</td></tr>
+            <tr><td><strong>Gatilho</strong> ou <strong>Acionador</strong></td><td>O despertador do Google que dispara a rotina no horário.</td></tr>
+            <tr><td><strong>Atalho</strong></td><td>Um apontador para um arquivo que está em outro lugar. Ocupa espaço zero.</td></tr>
+            <tr><td><strong>API</strong> · <strong>chave de API</strong></td><td>A senha que dá acesso à inteligência artificial.</td></tr>
+            <tr><td><strong>Token</strong></td><td>Pedacinho de palavra. É como as inteligências artificiais contam o tamanho do texto.</td></tr>
+            <tr><td><strong>TPM</strong></td><td>Tokens por minuto: o limite de quanto texto a IA aceita por minuto.</td></tr>
+            <tr><td><strong>Log</strong></td><td>O diário do sistema. Registra o que aconteceu em cada execução.</td></tr>
+            <tr><td><strong>Perfil</strong> ou <strong>layout</strong></td><td>O mapa de “qual coluna é o quê” numa planilha.</td></tr>
+            <tr><td><strong>Severidade</strong></td><td>Gravidade: crítica, alta, média ou baixa.</td></tr>
+            <tr><td><strong>Tratativa</strong></td><td>A ação registrada em resposta ao evento notificado.</td></tr>
+            <tr><td><strong>Subnotificação</strong></td><td>Quando param de registrar os eventos, mas eles continuam acontecendo.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="s11">
+      <h2><span class="h2num">11</span><span>Onde fica cada coisa</span></h2>
+      <div class="tab-wrap largo">
+        <table>
+          <thead><tr><th>O quê</th><th>Link</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Pasta de fontes</strong><br><span style="color:var(--tinta-suave)">ponha as planilhas aqui</span></td><td><a href="https://drive.google.com/drive/folders/1XQP4luO40ecRZXKYI93qkfIN-Oacaxyx">Qualidade - Fontes do Motor ↗</a></td></tr>
+            <tr><td><strong>Planilha de controle</strong><br><span style="color:var(--tinta-suave)">aba LOG</span></td><td><a href="https://docs.google.com/spreadsheets/d/1eI1WkQ2QkWVL0MENCNpmP2jhQtDSWYAzcKB-WF6VHOA/edit">Controle - Motor de Indicadores ↗</a></td></tr>
+            <tr><td><strong>O programa</strong><br><span style="color:var(--tinta-suave)">Apps Script</span></td><td><a href="https://script.google.com/home/projects/1sLpylZrGaBvhv2xK2g2LI7-zs8hoD3HOp0hS8YKxdiw6Hlxg7qAmCjNV/edit">Motor de Indicadores - Bewiki Care ↗</a></td></tr>
+            <tr><td>Console da Groq</td><td><a href="https://console.groq.com/keys">console.groq.com/keys ↗</a></td></tr>
+            <tr><td>Google AI Studio</td><td><a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey ↗</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="s12">
+      <h2><span class="h2num">12</span><span>Rotina de manutenção</span></h2>
+      <p>Pouca coisa, e nada urgente.</p>
+      <div class="tab-wrap largo">
+        <table>
+          <thead><tr><th>Quando</th><th>O quê</th><th style="white-space:nowrap">Tempo</th></tr></thead>
+          <tbody>
+            <tr><td>Toda segunda, depois do e-mail</td><td>Ler o e-mail. Se o assunto disser <span class="faixa v">ATENÇÃO CRÍTICA</span>, abrir.</td><td>5 min</td></tr>
+            <tr><td>Uma vez por semana</td><td>Abrir a aba LOG e procurar <code>ERROR</code></td><td>2 min</td></tr>
+            <tr><td>Quando chegar planilha nova</td><td>Jogar na pasta de fontes (item 4.1)</td><td>30 seg</td></tr>
+            <tr><td>Quando um setor mudar o formulário</td><td>Rodar <code>limparCachePerfis</code> e depois <code>Z1_Diagnosticar</code></td><td>2 min</td></tr>
+            <tr><td>Se os comentários piorarem</td><td>Melhorar o campo <code>atencao</code> (item 08)</td><td>15 min</td></tr>
+            <tr><td>Uma vez por mês</td><td>Rodar <code>relatorioChaves</code> para ver o consumo</td><td>1 min</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="s13">
+      <h2><span class="h2num">13</span><span>Chamar ajuda técnica</span></h2>
+      <p>Entregue estas quatro informações — elas resolvem a maior parte do diagnóstico:</p>
+      <ol class="lista">
+        <li><strong>O que você esperava</strong> e <strong>o que aconteceu</strong></li>
+        <li><strong>Print da aba LOG</strong>, nas linhas da data do problema</li>
+        <li><strong>Print do Registro de execução</strong> no Apps Script, se rodou à mão</li>
+        <li>Se foi e-mail: <strong>print do e-mail</strong>, com o assunto visível</li>
+      </ol>
+      <p>A documentação técnica fica na pasta do projeto: <code>RESUMO_TECNICO.md</code> traz a arquitetura e as decisões, e <code>docs/IMPLANTACAO.md</code> o passo a passo de instalação. Há também uma bateria de testes automatizados — <code>node tests/rodar.js</code>.</p>
+
+      <footer>
+        <p>Motor de Indicadores · Setor de Qualidade da Bewiki Care. Os números dos relatórios vêm de cálculo determinístico; as leituras e recomendações são geradas por modelo de linguagem e exigem validação humana antes de qualquer decisão.</p>
+      </footer>
+    </section>
+
+  </main>
+</div>
